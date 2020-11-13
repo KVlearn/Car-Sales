@@ -19,25 +19,29 @@ const initialState={
 export const carsReducer=(state=initialState,action)=>{
     switch(action.type){
         case ADD_FEATURE:
-            //newFeature has to be an array
-            let newFeature =  state.additionalFeatures.filter((item)=>{
-                if(item.id === action.payload){
-                    return item;
-                } return null;
-            })
             return {
+                //1.copy state 2.update additonalPrice 3.add car.features 4. remove in additionalFeatures
                 ...state,
-                additionalPrice: state.additionalPrice + newFeature[0].price,
+                additionalPrice:state.additionalPrice + action.payload.price,
                 car: {...state.car,
-                     features: [...state.car.features,...newFeature]  
-            }}
+                features : [...state.car.features, ...state.additionalFeatures.filter((item)=>{
+                    if(item.id === action.payload.id){
+                        return item
+                    } 
+                })]},
+                additionalFeatures : state.additionalFeatures.filter(item => item.id !== action.payload.id)
+            }
+             
             case REMOVE_FEATURE :
                 return {
                     ...state,
                     additionalPrice:state.additionalPrice - action.payload.price,
-                    car:{...state.car,
-                         features:[...state.car.features.filter((item)=> item.id !== action.payload.id
-                         )]}
+                    car: {...state.car,
+                        features :[...state.car.features.filter(item=> item.id != action.payload.id)]
+                    },
+                    additionalFeatures : [...state.additionalFeatures,
+                        ...state.car.features.filter (item=>item.id === action.payload.id)]
+
                 }
         default:
             return state;
